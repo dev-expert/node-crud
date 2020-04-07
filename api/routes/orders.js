@@ -8,8 +8,12 @@ router.get('/', (req,res,next) => {
 })
 
 router.post('/', (req,res,next) => {
+    const order = {
+        amount: req.body.amount,
+    }
     res.status(201).json({
-        message: 'Handling POST request to Orders page'
+        message: 'Handling POST request to Orders page',
+        created: order
     })
 })
 
