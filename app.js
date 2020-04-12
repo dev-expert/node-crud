@@ -8,7 +8,7 @@ const productRoutes = require('./api/routes/products')
 const orderRoutes = require('./api/routes/orders')
 const userRoutes = require('./api/routes/users')
 
-mongoose.connect('mongodb+srv://ujjwal98:password@cluster0-end9f.mongodb.net/test?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://ujjwal98:@cluster0-end9f.mongodb.net/test?retryWrites=true&w=majority', {
     useMongoClient: true
 })
 

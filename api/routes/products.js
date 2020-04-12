@@ -9,10 +9,25 @@ router.get('/', (req,res,next) => {
     //     message: 'Handling GET request to products page'
     // })
     Product.find()
+    .select('name price _id')
     .exec()
     .then(docs => {
-        console.log(docs),
-        res.status(200).json(docs)
+        // console.log(docs),
+        const response = {
+            count: docs.length,
+            products: docs.map(doc => {
+                return {
+                    name: doc.name,
+                    price: doc.price,
+                    id: doc._id,
+                    request: {
+                        type: 'GET',
+                        url: 'http://localhost:3005/products/' + doc._id
+                    }
+                }
+            })
+        }
+        res.status(200).json(response)
     })
     .catch(err => {
         console.log(err),
@@ -33,8 +48,16 @@ router.post('/', (req,res,next) => {
     product.save().then(result => {
         console.log(result)
         res.status(201).json({
-            message: 'Handling POST request to products page',
-            created: result
+            message: 'Created product successfully',
+            created: {
+                name: result.name,
+                price: result.price,
+                _id: result._id,
+                result: {
+                    type: 'GET',
+                    url: 'http://localhost:3005/products/' + result._id
+                }
+            }
         })
     })
     .catch(err => {
@@ -77,11 +100,28 @@ router.patch('/:productId', (req,res,next) => {
     // res.status(200).json({
     //     message: 'Updated Product',
     // })
-    Product.update({ _id: id}, { $set: {
-        name: req.body.newName,
-        price: req.body.newPrice
-    }})
-
+    const updateOps = {}
+    for(const ops of req.body){
+        updateOps[ops.propName] = ops.value;
+    }
+    Product.update({ _id: id}, { $set: updateOps}).exec()
+    .then(result => {
+        res.status(200).json({
+            message: 'Product updated',
+            request: {
+                type: 'GET',
+                url: 'http://localhost:3005/products/' + id
+            }
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({error: err})
+    })
+    // Product.update({ _id: id}, { $set: {
+    //     name: req.body.newName,
+    //     price: req.body.newPrice
+    // }})
 })
 
 router.delete('/:productId', (req,res,next) => {
